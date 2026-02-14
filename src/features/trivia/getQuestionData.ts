@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { z } from "zod";
 import { shuffleArray } from "~/utils/helpers";
 

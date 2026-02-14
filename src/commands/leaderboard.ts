@@ -30,7 +30,7 @@ const statChoices = [
   { name: "highest points", value: "highestPoints" }
 ] as const;
 
-type Stat = typeof statChoices[number]["value"];
+type Stat = (typeof statChoices)[number]["value"];
 
 const command = new SlashCommandBuilder()
   .setName(commandName)
