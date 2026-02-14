@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rimraf dist && cd src && tsc",
-    "start": "nodemon --config nodemon.json src/index.ts",
-    "start:prod": "node --require module-alias/register index.js"
+    "dev": "tsx watch src/index.ts",
+    "start": "node --require module-alias/register index.js"
   },
   "repository": {
     "type": "git",
@@ -28,11 +28,9 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-prettier": "^5.5.5",
-    "nodemon": "^3.1.11",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.2",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"
   },

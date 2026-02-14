@@ -30,4 +30,4 @@ COPY package.json pnpm-lock.yaml /usr/knowledge-knight/
 RUN pnpm install --prod --frozen-lockfile
 COPY --from=build /usr/knowledge-knight-src/dist /usr/knowledge-knight
 
-CMD ["pnpm", "run", "start:prod"]
+CMD ["pnpm", "start"]
