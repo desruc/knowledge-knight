@@ -1,29 +1,15 @@
-version: '3.7'
-
 services:
   postgres:
-    container_name: know-it-all-postgresdb
-    image: postgres:10.5
-    restart: on-failure
+    image: postgres:16-alpine
+    container_name: knowledge_knight_db
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: knowledge_knight
     ports:
-      - 5432:5432
-
-  pgadmin:
-    container_name: know-it-all-pgadmin
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      - '5432:5432'
     volumes:
-       - pgadmin:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    restart: on-failure
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-    postgres:
-    pgadmin:
+  postgres_data:

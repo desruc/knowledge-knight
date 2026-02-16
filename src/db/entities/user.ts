@@ -2,30 +2,30 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class User {
-  @PrimaryColumn()
+  @PrimaryColumn("varchar")
   id: string;
 
-  @Column()
+  @Column("varchar")
   guild: string;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   currentStreak: number;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   highestStreak: number;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   currentPoints: number;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   highestPoints: number;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   totalCorrectAnswers: number;
 
-  @Column({ default: 0 })
+  @Column("int", { default: 0 })
   totalAnswers: number;
 
-  @Column({ default: false })
+  @Column("boolean", { default: false })
   answered: boolean;
 }
