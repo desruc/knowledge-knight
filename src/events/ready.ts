@@ -37,6 +37,6 @@ async function exec(client: Client) {
 }
 
 export const ready: DiscordEvent = {
-  name: "ready",
+  name: "clientReady",
   exec
 };
