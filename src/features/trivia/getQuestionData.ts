@@ -24,14 +24,14 @@ export const getQuestionData = async () => {
 
   const { question, correct_answer, incorrect_answers } = questionData;
 
+  const decodedQuestion = decodeURIComponent(question);
   const incorrectAnswers = incorrect_answers.map((i) => decodeURIComponent(i));
-
   const answer = decodeURIComponent(correct_answer).trim();
 
   const allAnswers = shuffleArray<string>([...incorrectAnswers, answer]);
 
   return {
-    question,
+    question: decodedQuestion,
     answer,
     allAnswers,
     incorrectAnswers

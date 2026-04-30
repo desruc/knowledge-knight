@@ -1,9 +1,9 @@
-import { ComponentType, Guild } from "discord.js";
+import { ComponentType, EmbedBuilder, Guild, MessageFlags } from "discord.js";
 import { Job as ScheduledJob } from "node-schedule";
 import { logger } from "~/core/logger";
 import { randomNumber, getTextChannel } from "~/utils/helpers";
 import { hasUserAnswered, resetAnswered } from "~/db/repositories/userRepository";
-import { getQuestionData } from "./getQuestionData";
+import { getNextQuestion } from "./getNextQuestion";
 import { onAlreadyAnswered, onCorrectAnswer, onWrongAnswer } from "./handleAnswer";
 import {
   createTriviaEmbed,
@@ -45,7 +45,8 @@ export async function sendTriviaQuestion(guild: Guild) {
       throw new Error("Could not find a suitable text channel");
     }
 
-    const { question, answer, allAnswers } = await getQuestionData();
+    const { question, answer, allAnswers, submitterId, submitterUsername } =
+      await getNextQuestion();
 
     const message = await channel.send({
       embeds: [createTriviaEmbed(question)],
@@ -59,7 +60,23 @@ export async function sendTriviaQuestion(guild: Guild) {
 
     const winnerStopReason = "winner";
 
+    const buildEndEmbed = () => {
+      const base = EmbedBuilder.from(message.embeds[0]);
+      if (submitterUsername) {
+        base.setFooter({ text: `Submitted by ${submitterUsername}` });
+      }
+      return base;
+    };
+
     collector.on("collect", async (interaction) => {
+      if (submitterId && interaction.user.id === submitterId) {
+        await interaction.reply({
+          content: "You submitted this one — sit it out!",
+          flags: MessageFlags.Ephemeral
+        });
+        return;
+      }
+
       const hasAnswered = await hasUserAnswered(guild.id, interaction.user.id);
 
       if (hasAnswered) {
@@ -69,7 +86,10 @@ export async function sendTriviaQuestion(guild: Guild) {
         if (pointsToGive === 1) {
           collector.stop(winnerStopReason);
 
-          message.edit({ components: [getCompletedAnswerRow(allAnswers, answer)] });
+          message.edit({
+            embeds: [buildEndEmbed()],
+            components: [getCompletedAnswerRow(allAnswers, answer)]
+          });
 
           await onCorrectAnswer(guild, interaction, pointsToGive);
 
@@ -100,6 +120,7 @@ export async function sendTriviaQuestion(guild: Guild) {
 
           message.edit({
             content: "**Times up!** Congratulations to the winners!",
+            embeds: [buildEndEmbed()],
             components: [getCompletedAnswerRow(allAnswers, answer)]
           });
         } else {
@@ -110,6 +131,7 @@ export async function sendTriviaQuestion(guild: Guild) {
 
           message.edit({
             content: "**Times up!** No one answered correctly.",
+            embeds: [buildEndEmbed()],
             components: [getCompletedAnswerRow(allAnswers, answer)]
           });
         }

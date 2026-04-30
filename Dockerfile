@@ -1,33 +1,30 @@
 # Build layer
-FROM node:lts-alpine AS build
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN mkdir -p /usr/knowledge-knight-src/
-WORKDIR /usr/knowledge-knight-src/
-COPY package.json pnpm-lock.yaml /usr/knowledge-knight-src/
+FROM node:22-alpine AS build
+RUN corepack enable
+WORKDIR /usr/knowledge-knight-src
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
-COPY . /usr/knowledge-knight-src/
+COPY . .
 RUN pnpm run build
 
 # Image layer
-FROM node:lts-alpine
+FROM node:22-alpine
 
-ARG DISCORD_TOKEN
-ARG DB_URL
-ARG CLIENT_ID
-ARG TZ
-
-ENV DISCORD_TOKEN=${DISCORD_TOKEN}
-ENV DB_URL=${DB_URL}
-ENV CLIENT_ID=${CLIENT_ID}
-ENV TZ=${TZ}
-
+# Runtime env vars (DISCORD_TOKEN, DB_URL, CLIENT_ID, TZ) are supplied at
+# `docker run` time. We deliberately don't bake them into the image so the
+# published artifact contains no secrets.
 ENV NODE_ENV=production
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN mkdir -p /usr/knowledge-knight
-WORKDIR /usr/knowledge-knight
-COPY package.json pnpm-lock.yaml /usr/knowledge-knight/
-RUN pnpm install --prod --frozen-lockfile
-COPY --from=build /usr/knowledge-knight-src/dist /usr/knowledge-knight
+RUN corepack enable
 
-CMD ["pnpm", "start"]
+# Run as the unprivileged `node` user that ships with the base image. We use
+# /home/node/app so the node user owns its workdir and pnpm's per-user store
+# without any chown gymnastics.
+USER node
+WORKDIR /home/node/app
+
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
+COPY --from=build --chown=node:node /usr/knowledge-knight-src/dist ./
+
+CMD ["node", "--require", "module-alias/register", "index.js"]

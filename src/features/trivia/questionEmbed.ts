@@ -14,13 +14,8 @@ export const getInitialComponentRow = (answers: string[]) => {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
 };
 
-export const createTriviaEmbed = (question: string): EmbedBuilder => {
-  const embed = new EmbedBuilder().setColor(Colors.LuminousVividPink);
-
-  embed.setTitle(decodeURIComponent(question));
-
-  return embed;
-};
+export const createTriviaEmbed = (question: string): EmbedBuilder =>
+  new EmbedBuilder().setColor(Colors.LuminousVividPink).setTitle(question);
 
 export const getCompletedAnswerRow = (answers: string[], correctAnswer: string) => {
   const buttons = answers.map((a) =>

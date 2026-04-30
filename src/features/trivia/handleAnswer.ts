@@ -1,3 +1,4 @@
+import { MessageFlags } from "discord.js";
 import type { ButtonInteraction, Guild } from "discord.js";
 import { markHasAnswered, updateWinner } from "~/db/repositories/userRepository";
 
@@ -29,5 +30,5 @@ export const onWrongAnswer = async (
 export const onAlreadyAnswered = async (interaction: ButtonInteraction) =>
   interaction.reply({
     content: "Sorry! You can only submit one answer per day.",
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
