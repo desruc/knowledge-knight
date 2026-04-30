@@ -31,9 +31,7 @@ async function exec(client: Client) {
 
   resetAnswered();
 
-  client.guilds.cache.forEach((guild) => {
-    deployCommands(guild);
-  });
+  deployCommands(client);
 }
 
 export const ready: DiscordEvent = {
